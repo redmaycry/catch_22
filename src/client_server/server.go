@@ -3,11 +3,9 @@ package clientserver
 import (
 	"fmt"
 	"net/http"
-	"sync"
 )
 
-func StartServer(port string, wg *sync.WaitGroup) {
-	defer wg.Done()
+func StartServer(port string) {
 
 	http.HandleFunc("/placements/request", handleRequest)
 
