@@ -11,6 +11,7 @@ import (
 	"net/http"
 	customtypes "sample-choose-ad/src/custom_types"
 	req_types "sample-choose-ad/src/requests_types"
+	"sort"
 )
 
 // Create requset body based in incoming reqest `ir` and return
@@ -79,7 +80,13 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 
 		p_body := constructPartnersRequestBody(&incReq)
 
-		var partnersRespones []req_types.SuccesResponse
+		// Two data structures:
+		// partnersRespones for getting price with O(1) complexity
+		// []prices as slice of actual prices
+		// var partnersRespones map[float64]req_types.RespImp
+		partnersRespones := make(map[uint]map[float64]req_types.RespImp)
+		prices := make(map[uint][]float64)
+
 		for _, p := range partners {
 			url := fmt.Sprintf("http://%v:%v", p.Ip, p.Port)
 
@@ -90,7 +97,14 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 				continue
 			}
 			// adding only successful responses
-			partnersRespones = append(partnersRespones, re)
+			for _, r := range re.Imp {
+				if partnersRespones[r.Id] == nil {
+					partnersRespones[r.Id] = make(map[float64]req_types.RespImp)
+				}
+				partnersRespones[r.Id][r.Price] = r
+				prices[r.Id] = append(prices[r.Id], r.Price)
+			}
+
 		}
 
 		if len(partnersRespones) == 0 {
@@ -98,17 +112,34 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 			return
 		}
 
-		// для каждого tile в incReq надо найти
-		// maxPrice := 0
-
-		// var bestOptionRespone req_types.SuccesResponse
-		var bestOptions []req_types.Imp
-		_ = bestOptions
-
-		for _, tile := range incReq.Tiles {
-			for _, partner := range partnersRespones {
-			}
+		// Sorting prices, now biggest price at index len-1
+		for _, p := range prices {
+			sort.Float64s(p)
 		}
 
+		var bestOptions []req_types.RespImp
+
+		// for each tile peak best price
+		for _, tile := range incReq.Tiles {
+			last := len(prices[tile.Id]) - 1
+			biggestPrice := prices[tile.Id][last]
+			_ = biggestPrice
+			bestOptions = append(bestOptions, partnersRespones[tile.Id][biggestPrice])
+		}
+
+		response := req_types.SuccesResponse{
+			Id:  *incReq.Id,
+			Imp: bestOptions,
+		}
+
+		respJSON, err := json.Marshal(response)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(respJSON)
 	}
 }

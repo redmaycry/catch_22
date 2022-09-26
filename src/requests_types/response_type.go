@@ -1,11 +1,12 @@
 package req_types
 
 type RespImp struct {
-	Width  uint
-	Height uint
-	Tile   string
-	Url    string
-	Price  float64
+	Id     uint    `json:"id"`
+	Width  uint    `json:"width"`
+	Height uint    `json:"height"`
+	Tile   string  `json:"tile"`
+	Url    string  `json:"url"`
+	Price  float64 `json:"price"`
 }
 
 // Response from ad partners
