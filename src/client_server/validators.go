@@ -21,7 +21,7 @@ func wrongIPAddresFormat(ipv4 string) bool {
 
 func throwHTTPError(err_text string, code int, w *http.ResponseWriter) {
 	http.Error(*w, err_text, code)
-	log.Printf("Error %d %v\n", code, err_text)
+	log.Printf("Error: %d %v\n", code, err_text)
 }
 
 func ParsePartnersAddress(ipAndPort string) (string, int64, error) {

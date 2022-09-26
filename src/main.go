@@ -22,14 +22,11 @@ import (
 	"strings"
 )
 
-var partners []customtypes.PartnersAddress
-
 func main() {
-	log.Println("Starting server")
+	log.Println("Info: Starting server")
 
 	port := flag.String("p", "", "-p 5050")
 	addressesList := flag.String("d", "", "-d '10.10.10.10:5050,10.10.10.20:5050'")
-
 	flag.Parse()
 
 	if *port == "" {
@@ -41,7 +38,7 @@ func main() {
 	}
 
 	// Parse first 10 ip:port pairs into `[]partners` slise
-
+	var partners []customtypes.PartnersAddress
 	for i, p := range strings.Split(*addressesList, ",") {
 
 		if i == 10 {
