@@ -8,6 +8,7 @@ type RespImp struct {
 	Price  float64
 }
 
+// Response from ad partners
 type SuccesResponse struct {
 	Id  string    `json:"id"`
 	Imp []RespImp `json:"imp"`
