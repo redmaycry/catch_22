@@ -1,16 +1,14 @@
 /*
 Usage:
 
-   sample-choose-ad [flags]
+	sample-choose-ad [flags]
 
 The flags are:
-   -p
-       Listening port
-   -d
-       Adversment partners list in format ip_p1:port,ip_p2:port2...ip_p10:port
 
-
-
+	-p
+	    Listening port
+	-d
+	    Adversment partners list in format ip_p1:port,ip_p2:port2...ip_p10:port
 */
 package main
 
@@ -49,8 +47,7 @@ func main() {
 		ip, port, err := clientserver.ParsePartnersAddress(p)
 
 		if err != nil {
-			log.Println(err)
-			continue
+			log.Fatalln(err)
 		}
 
 		partners = append(partners, customtypes.PartnersAddress{
