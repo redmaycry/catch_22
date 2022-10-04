@@ -3,6 +3,7 @@ package clientserver
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,6 +23,8 @@ func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) 
 
 	if err != nil {
 		log.Println(err)
+		eText := fmt.Sprintf("%v\n not responding", url)
+		return pResp, errors.New(eText)
 	}
 
 	if resp.StatusCode == 204 {

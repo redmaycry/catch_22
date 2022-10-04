@@ -3,6 +3,7 @@ package clientserver
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,6 +14,8 @@ import (
 	req_types "sample-choose-ad/src/requests_types"
 	"sort"
 )
+
+const PARTNER_ENDPOINT = "bid_request"
 
 // Create requset body based in incoming reqest `ir` and return
 // `OutgoingRequest` as bytes.Reader from marshaled JSON
@@ -38,44 +41,50 @@ func constructPartnersRequestBody(ir *req_types.IncomingRequest) io.Reader {
 
 // Parsing and checking incoming request.
 func parseAndCheckIncomingRequest(w http.ResponseWriter, r *http.Request) (req_types.IncomingRequest, error) {
-	body, _ := ioutil.ReadAll(r.Body)
 
 	var inpReqBody req_types.IncomingRequest
 	var err error
 
+	//check request method. Only POST valid.
+	if r.Method == "GET" {
+		return inpReqBody, errors.New("Wrong request method")
+	}
+
+	// Check if body in incoming request is empty
+	body, _ := ioutil.ReadAll(r.Body)
+
 	if json.Unmarshal(body, &inpReqBody) != nil {
-		throwHTTPError("WRONG_SCHEMA", 400, &w)
-		return inpReqBody, err
+		return inpReqBody, throwHTTPError("WRONG_SCHEMA", 400, &w)
 	}
 
 	// Check if Id is empty
 	if inpReqBody.Id == nil {
-		throwHTTPError("EMPTY_FIELD", 400, &w)
-		return inpReqBody, err
+		return inpReqBody, throwHTTPError("EMPTY_FIELD", 400, &w)
 	}
 
 	// Check if tiles is empty
 	if len(inpReqBody.Tiles) == 0 {
-		throwHTTPError("EMPTY_TILES", 400, &w)
-		return inpReqBody, err
+		return inpReqBody, throwHTTPError("EMPTY_TILES", 400, &w)
 	}
 
 	// ipv4 validation
 	if wrongIPAddresFormat(inpReqBody.Context.Ip) {
-		throwHTTPError("WRONG_SCHEMA", 400, &w)
-		return inpReqBody, err
+		return inpReqBody, throwHTTPError("WRONG_SCHEMA", 400, &w)
 	}
 
 	return inpReqBody, err
 }
 
-// Request handler with closure (make request for each partner in `[]partners`).
+// Request handler with wrapper (make request for each partner in `[]partners`).
 func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		// Parse incoming request and return an error, if it's empty
+		// or contains wrong/empty fields
 		incReq, err := parseAndCheckIncomingRequest(w, r)
 		if err != nil {
 			log.Println(err)
+			return
 		}
 
 		p_body := constructPartnersRequestBody(&incReq)
@@ -88,7 +97,7 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 		prices := make(map[uint][]float64)
 
 		for _, p := range partners {
-			url := fmt.Sprintf("http://%v:%v", p.Ip, p.Port)
+			url := fmt.Sprintf("http://%v:%v/%v", p.Ip, p.Port, PARTNER_ENDPOINT)
 
 			re, err := sendRequest(url, &p_body)
 

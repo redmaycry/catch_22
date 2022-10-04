@@ -21,9 +21,10 @@ func wrongIPAddresFormat(ipv4 string) bool {
 	return !re.Match([]byte(ipv4))
 }
 
-func throwHTTPError(err_text string, code int, w *http.ResponseWriter) {
+func throwHTTPError(err_text string, code int, w *http.ResponseWriter) error {
 	http.Error(*w, err_text, code)
-	log.Printf("Error: %d %v\n", code, err_text)
+	eText := fmt.Sprintf("Error: %d %v", code, err_text)
+	return errors.New(eText)
 }
 
 // Wait string in format "10.10.10.10:8080", where `10.10.10.10` IPv4,

@@ -2,6 +2,7 @@ package clientserver
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	customtypes "sample-choose-ad/src/custom_types"
 )
@@ -9,6 +10,8 @@ import (
 func StartServer(port string, partners []customtypes.PartnersAddress) {
 
 	http.HandleFunc("/placements/request", handleRequest(partners))
-	http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
+	// http.HandleFunc("/placements/request", decorate(test2))
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 
 }
