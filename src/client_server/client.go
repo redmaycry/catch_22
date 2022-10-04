@@ -26,6 +26,7 @@ func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) 
 		eText := fmt.Sprintf("%v\n not responding", url)
 		return pResp, errors.New(eText)
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode == 204 {
 		return pResp, errors.New("No content")
