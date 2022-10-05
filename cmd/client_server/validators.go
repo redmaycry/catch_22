@@ -10,7 +10,10 @@ import (
 	"strings"
 )
 
-const MAX_PORT_NUM = 65535
+const (
+	MAX_PORT_NUM = 65535
+	MIN_PORT_NUM = 1024
+)
 
 // Returns false if ipv4 `correct`.
 func wrongIPAddresFormat(ipv4 string) bool {
@@ -31,20 +34,33 @@ func throwHTTPError(err_text string, code int, w *http.ResponseWriter) error {
 // and `8080` port. If ip or port has wrong format, returns error.
 func ParsePartnersAddress(ipAndPort string) (string, int64, error) {
 	var err error
+	var ip string
+	var port int64
+
 	iap := strings.Split(ipAndPort, ":")
 
-	ip := iap[0]
+	if len(iap) != 2 {
+		err = errors.New(fmt.Sprintf("Wrong partners 'ip:port' format: %v", ipAndPort))
+		return ip, port, err
+	}
+
+	ip = iap[0]
 	if wrongIPAddresFormat(ip) {
 		err = errors.New(fmt.Sprintf("Wrong ip address format in partner ip: %v", ip))
 	}
 
-	port, e := strconv.ParseInt(iap[1], 10, 32)
+	port, e := strconv.ParseInt(iap[1], 10, 64)
 	if e != nil {
 		err = errors.New(fmt.Sprintf("Wrong port format in partner ip: %v", e))
+		return ip, port, err
 	}
 
 	if port > MAX_PORT_NUM {
 		err = errors.New(fmt.Sprintf("Wrong port in partner ip: grater than %v", MAX_PORT_NUM))
+	}
+
+	if port < MIN_PORT_NUM {
+		err = errors.New(fmt.Sprintf("Wrong port in partner ip: %v lower than %v", port, MIN_PORT_NUM))
 	}
 
 	return ip, port, err
