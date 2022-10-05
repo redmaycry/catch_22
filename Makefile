@@ -4,6 +4,19 @@ moc_server_address := 127.0.0.1:5059
 
 bold := \033[1m
 normal := \033[0m
+
+help:
+	@echo "$(bold)Makefile commands$(normal)"
+	@echo "-----------------"
+	@echo "$(bold)make build$(normal)   : will build the project"
+	@echo "$(bold)make tests$(normal)   : run tests for the project"
+	@echo "$(bold)make run$(normal)     : will run the project"
+	@echo ""
+	@echo "$(bold)OS commands$(normal)"
+	@echo "-----------"
+	@echo "start server at PORT with 'IP:PORT' list of partners:"
+	@echo "$(bold)./bin/simple-choose-ad -p PORT -d 'IP:PORT'$(normal)"
+
 run:
 	go run cmd/main.go -p $(port) -d "$(moc_server_address)"
 
@@ -40,15 +53,3 @@ test-server:
 
 tests:
 	@$(MAKE) test-server
-
-help:
-	@echo "$(bold)Makefile commands$(normal)"
-	@echo "-----------------"
-	@echo "$(bold)make build$(normal)   : will build the project"
-	@echo "$(bold)make tests$(normal)   : run tests for the project"
-	@echo "$(bold)make run$(normal)     : will run the project"
-	@echo ""
-	@echo "$(bold)OS commands$(normal)"
-	@echo "-----------"
-	@echo "start server at PORT with 'IP:PORT' list of partners:"
-	@echo "$(bold)./bin/simple-choose-ad -p PORT -d 'IP:PORT'$(normal)"
