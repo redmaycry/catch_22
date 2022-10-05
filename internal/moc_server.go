@@ -2,29 +2,16 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	vres := `{
-    "id": "123",
-    "imp": [{
-        "id": 123,
-        "width": 144,
-        "height": 122,
-        "title": "Title1",
-        "url": "example.com",
-        "price": 123.5
-    },{
-        "id": 123,
-        "width": 155,
-        "height": 133,
-        "title": "Title2",
-        "url": "upachka.com",
-        "price": 143.5
-    }]}`
+	file, err := os.ReadFile("internal/json/valid_response.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	addr := flag.String("l", "", "-l 127.0.0.1:5059")
 	flag.Parse()
@@ -32,12 +19,19 @@ func main() {
 		log.Fatalln("Error: listening address is required!")
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		b, _ := ioutil.ReadAll(r.Body)
-		log.Println(string(b))
-
+	http.HandleFunc("/bid_request", func(w http.ResponseWriter, r *http.Request) {
+		// b, _ := ioutil.ReadAll(r.Body)
+		// log.Println(string(b))
 		w.Header().Add("Content-Type", "application/json")
-		w.Write([]byte(vres))
+		w.Write(file)
 	})
+
+	// endpoint: /exit
+	// Terminate server with code 0.
+	http.HandleFunc("/exit", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		os.Exit(0)
+	})
+
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

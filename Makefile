@@ -21,19 +21,19 @@ build:
 	go build -o bin/simple-choose-ad cmd/main.go
 
 start-moc-server:
-	@echo "[!] Starting moc server on 127.0.0.1:5059..."
-	@nohup go run internal/moc_server.go -l $(moc_server_address)> /dev/null 2>&1 & echo $! > run.pid
+	@echo "[!] Starting moc server on $(moc_server_address) ..."
+	@go run internal/moc_server.go -l $(moc_server_address) &
+
 
 stop-moc-server:
 	@echo "[!] Killing moc server"
-	@cat run.pid | xargs kill -9
-	@rm run.pid
+	@curl -s -o /dev/null "$(moc_server_address)/exit" &
 
 test-server:
 	@echo "Testing server..."
+	@$(MAKE) start-moc-server
 	@cd "cmd/client_server/"; \
 	go test
-
-tests: start-moc-server
-	@$(MAKE) test-server
 	@$(MAKE) stop-moc-server
+
+tests: test-server
