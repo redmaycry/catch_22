@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -24,13 +25,19 @@ func main() {
         "url": "upachka.com",
         "price": 143.5
     }]}`
+
+	addr := flag.String("l", "", "-l 127.0.0.1:5059")
+	flag.Parse()
+	if *addr == "" {
+		log.Fatalln("Error: listening address is required!")
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		b, _ := ioutil.ReadAll(r.Body)
 		log.Println(string(b))
-		// as, err := json.Marshal(vres)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write([]byte(vres))
 	})
-	log.Fatal(http.ListenAndServe("127.0.0.1:5059", nil))
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }

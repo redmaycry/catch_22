@@ -22,7 +22,7 @@ build:
 
 start-moc-server:
 	@echo "[!] Starting moc server on 127.0.0.1:5059..."
-	@nohup go run internal/moc_server.go> /dev/null 2>&1 & echo $! > run.pid
+	@nohup go run internal/moc_server.go -l $(moc_server_address)> /dev/null 2>&1 & echo $! > run.pid
 
 stop-moc-server:
 	@echo "[!] Killing moc server"
