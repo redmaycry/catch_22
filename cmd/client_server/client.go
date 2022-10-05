@@ -26,8 +26,7 @@ func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) 
 	resp, err := c.Post(url, "application/json", *body)
 
 	if err != nil {
-		log.Println(err)
-		eText := fmt.Sprintf("%v\n not responding", url)
+		eText := fmt.Sprintf("Error: partner %v not responding", url)
 		return pResp, errors.New(eText)
 	}
 	defer resp.Body.Close()
@@ -38,10 +37,10 @@ func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) 
 
 	b, _ := ioutil.ReadAll(resp.Body)
 
-	err = json.Unmarshal(b, &pResp)
-	if err != nil {
+	if json.Unmarshal(b, &pResp) != nil {
 		log.Println(err)
 	}
+
 	return pResp, nil
 }
 

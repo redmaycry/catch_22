@@ -6,7 +6,7 @@ type RespImp struct {
 	Height uint    `json:"height"`
 	Title  string  `json:"title"`
 	Url    string  `json:"url"`
-	Price  float64 `json:"price"`
+	Price  float64 `json:"price,string"`
 }
 
 // Response from ad partners
