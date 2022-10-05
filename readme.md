@@ -6,3 +6,8 @@ make build
 ./bin/simple-choose-ad -p PORT -d "IP:PORT"
 ```
 где `PORT` это порт для входящих запросов, который слушает сервис, а `IP:PORT,IP2:PORT` список рекламных партнеров.
+
+Также можно просмотреть help
+```shell
+make help
+```
