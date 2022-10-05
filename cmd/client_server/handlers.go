@@ -106,6 +106,10 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 
 		// for each tile peak best price
 		for _, tile := range incReq.Tiles {
+			if len(prices[tile.Id]) == 0 {
+				log.Println("No imp for tile ", tile.Id)
+				continue
+			}
 			last := len(prices[tile.Id]) - 1
 			biggestPrice := prices[tile.Id][last]
 			bestOptions = append(bestOptions, partnersRespones[tile.Id][biggestPrice])
