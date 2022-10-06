@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"math"
@@ -16,14 +15,14 @@ import (
 	"time"
 )
 
-func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) {
+func sendRequest(url string, body *[]byte) (req_types.SuccesResponse, error) {
 	var pResp req_types.SuccesResponse
 
 	c := &http.Client{
 		Timeout: 200 * time.Millisecond,
 	}
 
-	resp, err := c.Post(url, "application/json", *body)
+	resp, err := c.Post(url, "application/json", bytes.NewReader(*body))
 
 	if err != nil {
 		eText := fmt.Sprintf("Error: partner %v not responding", url)
@@ -45,8 +44,8 @@ func sendRequest(url string, body *io.Reader) (req_types.SuccesResponse, error) 
 }
 
 // Create requset body based in incoming reqest `ir` and return
-// `OutgoingRequest` as bytes.Reader from marshaled JSON
-func constructPartnersRequestBody(ir *req_types.IncomingRequest) io.Reader {
+// `OutgoingRequest` as []byte from marshaled JSON
+func constructPartnersRequestBody(ir *req_types.IncomingRequest) []byte {
 	var outReqBody req_types.OutgoingRequest
 
 	var imps []req_types.Imp
@@ -63,7 +62,7 @@ func constructPartnersRequestBody(ir *req_types.IncomingRequest) io.Reader {
 	outReqBody.Imp = imps
 	outReqBody.Context = ir.Context
 	t, _ := json.Marshal(outReqBody)
-	return bytes.NewReader(t)
+	return t
 }
 
 // map[imp.id]map[imp.id.price]
