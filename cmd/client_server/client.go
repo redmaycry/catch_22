@@ -50,12 +50,12 @@ func constructPartnersRequestBody(ir *req_types.IncomingRequest) []byte {
 
 	var imps []req_types.Imp
 
-	// WARN: uint and float multiplication may cause problems
 	for _, tile := range ir.Tiles {
+		minheight := uint(math.Floor(float64(tile.Width) * tile.Ratio))
 		imps = append(imps, req_types.Imp{
 			Id:        tile.Id,
 			Minwidth:  tile.Width,
-			Minheight: uint(math.Floor(float64(tile.Width * uint(tile.Ratio))))})
+			Minheight: minheight})
 	}
 
 	outReqBody.Id = *ir.Id
