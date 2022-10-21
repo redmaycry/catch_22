@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const MAX_TIME_PER_REQUEST = time.Duration(250 * time.Millisecond)
+
 type customHandler struct {
 	Parners []customtypes.PartnersAddress
 	// context?
@@ -40,8 +42,9 @@ func StartServer(port string, partners []customtypes.PartnersAddress) {
 	// }
 	// s.ListenAndServe()
 	// h := http.HandleFunc("/placements/request", handleRequest(partners))
-	h := http.TimeoutHandler(handleRequest(partners), time.Duration(240*time.Millisecond), "{}")
+	h := http.TimeoutHandler(handleRequest(partners), MAX_TIME_PER_REQUEST, "")
 	http.Handle("/placements/request", h)
+	// http.Handle("/placements/request", handleRequest(partners))
 	// http.HandleFunc("/placements/request", decorate(test2))
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))

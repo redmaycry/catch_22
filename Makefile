@@ -1,7 +1,6 @@
 # port for main server
 port := 5053
 moc_server_address := 127.0.0.1:5059
-
 bold := \033[1m
 normal := \033[0m
 good := \033[1m\033[0;32m
@@ -43,6 +42,9 @@ test-port-endpoint:
 
 build:
 	go build -o bin/simple-choose-ad cmd/main.go
+
+build-and-push:
+	@GOOS=linux GOARCH=amd64 go build -o build/ssp cmd/main.go && rsync -ah build/ssp ubuntu:~/ssp-testbed-clone/builds
 
 start-moc-server:
 	@echo "[!] Starting up moc-server on $(moc_server_address) ..."
