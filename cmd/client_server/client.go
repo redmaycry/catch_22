@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// Make request to partner, born to run as gorutine, 'cuz send partner response into channel
 func makeRequest(url string, body *[]byte, response chan<- []req_types.RespImp, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -32,34 +33,17 @@ func makeRequest(url string, body *[]byte, response chan<- []req_types.RespImp, 
 	}
 	defer resp.Body.Close()
 
-	// maybe say smth to client?
+	// if response not good
 	if resp.StatusCode != 200 {
 		log.Println("Error: status code", resp.StatusCode)
 		return
 	}
 
 	b, _ := ioutil.ReadAll(resp.Body)
-	log.Println(string(b))
 	if err := json.Unmarshal(b, &pResp); err != nil {
 		log.Println("Error: response unmarshalling", err)
 		return
 	}
-
-	// try to convert prices to float
-
-	// for _, imp := range pResp.Imp {
-	// 	// log.Printf("%v : %T", imp.PriceStr, imp.PriceStr)
-	// 	// imp.Price = imp.PriceStr.(float64)
-	// 	// switch imp.PriceStr.(type) {
-	// 	// case float64:
-	// 	// 	imp.Price = imp.PriceStr.(float64)
-	// 	// case string:
-	// 	// 	imp.Price, err = strconv.ParseFloat(imp.PriceStr.(string), 64)
-	// 	// 	if err != nil {
-	// 	// 		log.Println("Pasring price error, ", err)
-	// 	// 	}
-	// 	// }
-	// }
 
 	response <- pResp.Imp
 }

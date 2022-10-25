@@ -84,7 +84,7 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 		for r := range responsesCh {
 			respImps = append(respImps, r...)
 		}
-		// У нас нет одинаковых пар цена и ид
+		//We have no identical pairs `id` and `price`
 		partnersRespones := make(map[uint]req_types.RespImp)
 		for _, resp := range respImps {
 			if _, exist := partnersRespones[resp.Id]; !exist {
@@ -99,17 +99,6 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 			}
 		}
 
-		// { drop this
-		log.Println("respImps")
-		for _, i := range respImps {
-			log.Printf("%v : %v", i.Id, i.Price)
-		}
-
-		log.Println("partnersRespones")
-		for _, i := range partnersRespones {
-			log.Printf("%v : %v", i.Id, i.Price)
-		}
-		// }
 		var bestOptions []req_types.RespImp
 
 		// tile.Id == RespImp.Id
@@ -120,13 +109,6 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 			}
 
 		}
-
-		// if len(bestOptions) == 0 {
-		// 	// log.Println("Error: no responses from partners.")
-		// 	log.Println("Error: No Content")
-		// 	w.WriteHeader(http.StatusNoContent)
-		// 	return
-		// }
 
 		response := req_types.SuccesResponse{
 			Id:  *incReq.Id,

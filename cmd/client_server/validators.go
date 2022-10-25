@@ -24,6 +24,7 @@ func wrongIPAddresFormat(ipv4 string) bool {
 	return !re.Match([]byte(ipv4))
 }
 
+// Wrapp and throw an error to log client
 func throwHTTPError(err_text string, code int, w *http.ResponseWriter) error {
 	http.Error(*w, err_text, code)
 	eText := fmt.Sprintf("Error: %d %vr", code, err_text)
