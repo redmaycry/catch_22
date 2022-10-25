@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	customtypes "sample-choose-ad/cmd/custom_types"
 	req_types "sample-choose-ad/cmd/requests_types"
 	"testing"
@@ -41,22 +43,12 @@ func TestPostRequestWithEmptyBody(t *testing.T) {
 }
 
 func TestPostRequestWithRightBody(t *testing.T) {
-	body_json := `{
-  "id": "123",
-  "tiles": [
-    {
-      "id": 123,
-      "width": 122,
-      "ratio": 1.5
-    }
-  ],
-  "context": {
-    "ip": "192.168.1.1",
-    "user_agent": "curl"
-  }
-}`
+	file, err := os.ReadFile("../../internal/curl_requests/simple.json")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	req := httptest.NewRequest(http.MethodPost, "/placements/request", bytes.NewBuffer([]byte(body_json)))
+	req := httptest.NewRequest(http.MethodPost, "/placements/request", bytes.NewBuffer(file))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	_, _ = req, w

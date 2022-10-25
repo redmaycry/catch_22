@@ -9,6 +9,7 @@ import (
 	"net/http"
 	customtypes "sample-choose-ad/cmd/custom_types"
 	req_types "sample-choose-ad/cmd/requests_types"
+	"strconv"
 	"sync"
 )
 
@@ -93,8 +94,24 @@ func handleRequest(partners []customtypes.PartnersAddress) http.HandlerFunc {
 			}
 
 			// Replase with new Imp, if last saved price smaller
-			// Using type assertion, 'cause `Price` is interface
-			if partnersRespones[resp.Id].Price.(float64) < resp.Price.(float64) {
+			// Using type switch and addition checks, 'cause `Price` is interface
+			var oldPrice float64
+			switch partnersRespones[resp.Id].Price.(type) {
+			case string:
+				oldPrice, _ = strconv.ParseFloat(partnersRespones[resp.Id].Price.(string), 64)
+			case float64:
+				oldPrice = partnersRespones[resp.Id].Price.(float64)
+			}
+
+			var newPrice float64
+			switch resp.Price.(type) {
+			case string:
+				newPrice, _ = strconv.ParseFloat(resp.Price.(string), 64)
+			case float64:
+				newPrice = resp.Price.(float64)
+			}
+
+			if oldPrice < newPrice {
 				partnersRespones[resp.Id] = resp
 			}
 		}
